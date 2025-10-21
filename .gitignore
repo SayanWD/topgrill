@@ -49,3 +49,6 @@ next-env.d.ts
 .turbo
 .cache
 
+# Documentation files (exclude from git)
+*.md
+!README.md
