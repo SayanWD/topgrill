@@ -52,3 +52,7 @@ next-env.d.ts
 # Documentation files (exclude from git)
 *.md
 !README.md
+
+# Additional files to exclude
+*.txt
+*.sql
