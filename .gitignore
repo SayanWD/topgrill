@@ -55,4 +55,8 @@ next-env.d.ts
 
 # Additional files to exclude
 *.txt
+
+# SQL files (except Supabase migrations and seed)
 *.sql
+!supabase/migrations/*.sql
+!supabase/seed.sql
