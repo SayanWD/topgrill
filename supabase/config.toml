@@ -1,0 +1,120 @@
+# ===============================================
+# SUPABASE LOCAL DEVELOPMENT CONFIG
+# ===============================================
+# Ports configured to avoid conflicts with existing services
+# Verified free ports: 54321-54326
+
+project_id = "topgrill"
+
+[api]
+enabled = true
+port = 54321                    # ✅ FREE - Supabase API Gateway
+schemas = ["public", "storage", "graphql_public"]
+extra_search_path = ["public", "extensions"]
+max_rows = 1000
+
+[db]
+port = 54322                    # ✅ FREE - PostgreSQL Database
+shadow_port = 54320             # For migrations
+major_version = 15
+
+[db.pooler]
+enabled = true
+port = 54329                    # Connection pooler (PgBouncer)
+pool_mode = "transaction"
+default_pool_size = 20
+max_client_conn = 100
+
+[realtime]
+enabled = true
+ip_version = "ipv4"
+
+[studio]
+enabled = true
+port = 54323                    # ✅ FREE - Supabase Studio (Web UI)
+api_url = "http://localhost"
+
+[inbucket]
+enabled = true
+port = 54324                    # ✅ FREE - Inbucket Web UI (Email testing)
+smtp_port = 54325               # ✅ FREE - SMTP Server
+pop3_port = 54326               # ✅ FREE - POP3 Server
+
+[storage]
+enabled = true
+file_size_limit = "50MiB"
+# Storage API uses main API port (54321)
+
+[auth]
+enabled = true
+site_url = "http://localhost:3100"
+additional_redirect_urls = ["http://localhost:3100/**"]
+jwt_expiry = 3600
+enable_signup = true
+enable_anonymous_sign_ins = false
+
+[auth.email]
+enable_signup = true
+double_confirm_changes = true
+enable_confirmations = false
+secure_password_change = false
+
+[auth.external.apple]
+enabled = false
+
+[auth.external.azure]
+enabled = false
+
+[auth.external.bitbucket]
+enabled = false
+
+[auth.external.discord]
+enabled = false
+
+[auth.external.facebook]
+enabled = false
+
+[auth.external.github]
+enabled = false
+
+[auth.external.gitlab]
+enabled = false
+
+[auth.external.google]
+enabled = false
+
+[auth.external.keycloak]
+enabled = false
+
+[auth.external.linkedin]
+enabled = false
+
+[auth.external.notion]
+enabled = false
+
+[auth.external.twitch]
+enabled = false
+
+[auth.external.twitter]
+enabled = false
+
+[auth.external.slack]
+enabled = false
+
+[auth.external.spotify]
+enabled = false
+
+[auth.external.workos]
+enabled = false
+
+[auth.external.zoom]
+enabled = false
+
+[analytics]
+enabled = false
+port = 54327
+vector_port = 54328
+# Disable analytics for local dev (optional)
+
+[functions]
+# Default configuration for Edge Functions

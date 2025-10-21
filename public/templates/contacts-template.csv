@@ -1,0 +1,6 @@
+Email,First Name,Last Name,Company,Phone,Source,Lifecycle Stage
+john.doe@acme.com,John,Doe,Acme Corporation,+1-555-0101,website,lead
+jane.smith@techcorp.io,Jane,Smith,TechCorp Inc,+1-555-0102,referral,mql
+bob.johnson@startup.com,Bob,Johnson,Startup LLC,+1-555-0103,google,sql
+alice.williams@enterprise.com,Alice,Williams,Enterprise Ltd,+1-555-0104,linkedin,opportunity
+charlie.brown@global.com,Charlie,Brown,Global Industries,+1-555-0105,facebook,customer
