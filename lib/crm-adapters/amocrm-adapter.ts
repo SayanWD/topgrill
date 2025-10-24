@@ -40,7 +40,13 @@ interface AmoCRMLead {
   updated_at: number
   closed_at?: number
   responsible_user_id: number
-  custom_fields_values?: any[]
+  custom_fields_values?: Array<{
+    field_id: number
+    field_name: string
+    field_code: string
+    field_type: string
+    values: Array<{ value: string }>
+  }>
   _embedded?: {
     contacts?: Array<{ id: number }>
     companies?: Array<{ id: number }>
@@ -53,7 +59,13 @@ interface AmoCRMCompany {
   created_at: number
   updated_at: number
   responsible_user_id: number
-  custom_fields_values?: any[]
+  custom_fields_values?: Array<{
+    field_id: number
+    field_name: string
+    field_code: string
+    field_type: string
+    values: Array<{ value: string }>
+  }>
 }
 
 export interface AmoCRMConfig {
@@ -96,9 +108,10 @@ export class AmoCRMAdapter extends BaseCRMAdapter {
    */
   async testConnection(): Promise<boolean> {
     try {
-      const response = await this.request('/account')
-      return response.ok
-    } catch {
+      const response = await this.request('/api/v4/account')
+      return !!response
+    } catch (error) {
+      console.error('amoCRM connection test failed:', error)
       return false
     }
   }
@@ -382,7 +395,7 @@ export class AmoCRMAdapter extends BaseCRMAdapter {
   /**
    * Get pipelines (для mapping статусов)
    */
-  async getPipelines(): Promise<any> {
+  async getPipelines(): Promise<{ _embedded: { pipelines: Array<{ id: number; name: string; statuses: Array<{ id: number; name: string }> }> } }> {
     const response = await this.request('/leads/pipelines')
     return response.json()
   }
@@ -390,9 +403,9 @@ export class AmoCRMAdapter extends BaseCRMAdapter {
   /**
    * Get custom fields definitions
    */
-  async getCustomFields(entityType: 'contacts' | 'leads' | 'companies'): Promise<any> {
-    const endpoint = entityType === 'deals' ? 'leads' : entityType
-    const response = await this.request(`/${endpoint}/custom_fields`)
+  async getCustomFields(entityType: 'contacts' | 'leads' | 'companies'): Promise<{ _embedded: { custom_fields: Array<{ id: number; name: string; code: string; type: string }> } }> {
+    const endpoint = entityType === 'leads' ? 'leads' : entityType
+    const response = await this.request(`/api/v4/${endpoint}/custom_fields`)
     return response.json()
   }
 }

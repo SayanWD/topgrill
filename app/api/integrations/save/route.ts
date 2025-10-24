@@ -19,13 +19,71 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { provider, accessToken, refreshToken, instanceUrl } = body
+    const { platform, credentials } = body
 
-    if (!provider || !accessToken) {
+    if (!platform || !credentials) {
       return NextResponse.json(
-        { error: 'Provider and accessToken required' },
+        { error: 'Platform and credentials required' },
         { status: 400 }
       )
+    }
+
+    // Validate credentials based on platform
+    let validatedCredentials: Record<string, unknown> = {}
+
+    switch (platform) {
+      case 'hubspot':
+        if (!credentials.accessToken) {
+          return NextResponse.json(
+            { error: 'HubSpot access token required' },
+            { status: 400 }
+          )
+        }
+        validatedCredentials = {
+          accessToken: credentials.accessToken,
+          refreshToken: credentials.refreshToken,
+          expiresAt: credentials.expiresAt,
+        }
+        break
+
+      case 'salesforce':
+        if (!credentials.accessToken || !credentials.instanceUrl) {
+          return NextResponse.json(
+            { error: 'Salesforce access token and instance URL required' },
+            { status: 400 }
+          )
+        }
+        validatedCredentials = {
+          accessToken: credentials.accessToken,
+          refreshToken: credentials.refreshToken,
+          instanceUrl: credentials.instanceUrl,
+          expiresAt: credentials.expiresAt,
+        }
+        break
+
+      case 'amocrm':
+        if (!credentials.accessToken || !credentials.subdomain) {
+          return NextResponse.json(
+            { error: 'amoCRM access token and subdomain required' },
+            { status: 400 }
+          )
+        }
+        validatedCredentials = {
+          accessToken: credentials.accessToken,
+          refreshToken: credentials.refreshToken,
+          subdomain: credentials.subdomain,
+          clientId: credentials.clientId,
+          clientSecret: credentials.clientSecret,
+          tokenType: credentials.tokenType || 'oauth',
+          expiresAt: credentials.expiresAt,
+        }
+        break
+
+      default:
+        return NextResponse.json(
+          { error: `Unsupported platform: ${platform}` },
+          { status: 400 }
+        )
     }
 
     // Save integration
@@ -33,12 +91,12 @@ export async function POST(request: NextRequest) {
       .from('integrations')
       .upsert({
         user_id: user.id,
-        provider,
-        provider_account_id: instanceUrl || provider,
-        access_token: accessToken,
-        refresh_token: refreshToken,
+        platform,
+        provider_account_id: credentials.subdomain || credentials.instanceUrl || platform,
+        access_token: credentials.accessToken,
+        refresh_token: credentials.refreshToken,
         status: 'active',
-        settings: { instanceUrl },
+        settings: validatedCredentials,
       })
       .select()
       .single()
@@ -57,4 +115,3 @@ export async function POST(request: NextRequest) {
     )
   }
 }
-

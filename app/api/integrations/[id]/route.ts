@@ -6,7 +6,7 @@ import { createServerSupabaseClient } from '@/lib/supabase/server'
  * DELETE /api/integrations/:id - Disconnect integration
  */
 export async function DELETE(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {

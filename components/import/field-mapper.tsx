@@ -3,8 +3,8 @@
 import { useState } from 'react'
 
 interface FieldMapperProps {
-  data: any
-  onComplete: (mapping: any) => void
+  data: Record<string, unknown>[]
+  onComplete: (mapping: Record<string, string>) => void
   onBack: () => void
 }
 
@@ -19,7 +19,7 @@ const standardFields = [
 ]
 
 export function FieldMapper({ data, onComplete, onBack }: FieldMapperProps) {
-  const [mapping, setMapping] = useState(data.suggestedMapping || {})
+  const [mapping, setMapping] = useState<Record<string, string>>({})
 
   const handleFieldSelect = (standardField: string, csvColumn: string) => {
     setMapping({
@@ -50,7 +50,7 @@ export function FieldMapper({ data, onComplete, onBack }: FieldMapperProps) {
       {/* Statistics */}
       <div className="rounded-lg bg-blue-50 p-4">
         <p className="text-sm text-blue-900">
-          📊 Found {data.stats.totalRows} rows with {data.stats.headers} columns
+          📊 Found {data.length} rows with {data[0] ? Object.keys(data[0]).length : 0} columns
         </p>
       </div>
 
@@ -72,11 +72,11 @@ export function FieldMapper({ data, onComplete, onBack }: FieldMapperProps) {
                 className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
               >
                 <option value="">-- Select column --</option>
-                {data.headers.map((header: string) => (
+                {data[0] ? Object.keys(data[0]).map((header: string) => (
                   <option key={header} value={header}>
                     {header}
                   </option>
-                ))}
+                )) : null}
               </select>
             </div>
 
@@ -104,13 +104,13 @@ export function FieldMapper({ data, onComplete, onBack }: FieldMapperProps) {
               </tr>
             </thead>
             <tbody>
-              {data.samples.slice(0, 3).map((row: any, idx: number) => (
+              {data.slice(0, 3).map((row: Record<string, unknown>, idx: number) => (
                 <tr key={idx} className="border-b">
                   {standardFields
                     .filter((f) => mapping[f.key])
                     .map((field) => (
                       <td key={field.key} className="px-4 py-2">
-                        {row[mapping[field.key]] || '-'}
+                        {String(row[mapping[field.key]] || '-')}
                       </td>
                     ))}
                 </tr>

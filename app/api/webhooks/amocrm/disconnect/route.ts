@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
-import { createHmac } from 'crypto'
 
 /**
  * amoCRM Disconnect Webhook
@@ -37,9 +36,21 @@ export async function GET(request: NextRequest) {
 
   // Calculate expected signature: HMAC(client_id|account_id, client_secret)
   const message = `${clientId}|${accountId}`
-  const expectedSignature = createHmac('sha256', clientSecret)
-    .update(message)
-    .digest('hex')
+  
+  // Use Web Crypto API for Edge Runtime compatibility
+  const encoder = new TextEncoder()
+  const key = await crypto.subtle.importKey(
+    'raw',
+    encoder.encode(clientSecret),
+    { name: 'HMAC', hash: 'SHA-256' },
+    false,
+    ['sign']
+  )
+  
+  const signatureBuffer = await crypto.subtle.sign('HMAC', key, encoder.encode(message))
+  const expectedSignature = Array.from(new Uint8Array(signatureBuffer))
+    .map(b => b.toString(16).padStart(2, '0'))
+    .join('')
 
   // Compare signatures (timing-safe)
   if (signature !== expectedSignature) {

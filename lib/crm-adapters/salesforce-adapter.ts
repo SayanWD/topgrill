@@ -53,7 +53,7 @@ export class SalesforceAdapter extends BaseCRMAdapter {
     const response = await this.query(query)
     const data = await response.json()
 
-    return data.records.map((record: any) => this.normalizeContact(record))
+    return data.records.map((record: Record<string, unknown>) => this.normalizeContact(record))
   }
 
   async fetchCompanies(options?: {
@@ -74,7 +74,7 @@ export class SalesforceAdapter extends BaseCRMAdapter {
     const response = await this.query(query)
     const data = await response.json()
 
-    return data.records.map((record: any) => this.normalizeCompany(record))
+    return data.records.map((record: Record<string, unknown>) => this.normalizeCompany(record))
   }
 
   async fetchDeals(options?: {
@@ -96,7 +96,7 @@ export class SalesforceAdapter extends BaseCRMAdapter {
     const response = await this.query(query)
     const data = await response.json()
 
-    return data.records.map((record: any) => this.normalizeDeal(record))
+    return data.records.map((record: Record<string, unknown>) => this.normalizeDeal(record))
   }
 
   async getTotalCount(type: 'contacts' | 'companies' | 'deals'): Promise<number> {
@@ -113,42 +113,42 @@ export class SalesforceAdapter extends BaseCRMAdapter {
     return data.totalSize || 0
   }
 
-  protected normalizeContact(data: any): CRMContact {
+  protected normalizeContact(data: Record<string, unknown>): CRMContact {
     return {
-      externalId: data.Id,
-      email: data.Email,
-      firstName: data.FirstName,
-      lastName: data.LastName,
-      phone: data.Phone,
-      companyName: data.Account?.Name,
-      source: data.LeadSource || 'salesforce',
-      createdAt: data.CreatedDate ? new Date(data.CreatedDate) : undefined,
+      externalId: data.Id as string,
+      email: data.Email as string,
+      firstName: data.FirstName as string,
+      lastName: data.LastName as string,
+      phone: data.Phone as string,
+      companyName: (data.Account as { Name: string })?.Name,
+      source: (data.LeadSource as string) || 'salesforce',
+      createdAt: data.CreatedDate ? new Date(data.CreatedDate as string) : undefined,
       metadata: data,
     }
   }
 
-  protected normalizeCompany(data: any): CRMCompany {
+  protected normalizeCompany(data: Record<string, unknown>): CRMCompany {
     return {
-      externalId: data.Id,
-      name: data.Name,
-      domain: data.Website,
-      industry: data.Industry,
-      size: data.NumberOfEmployees?.toString(),
+      externalId: data.Id as string,
+      name: data.Name as string,
+      domain: data.Website as string,
+      industry: data.Industry as string,
+      size: (data.NumberOfEmployees as number)?.toString(),
       metadata: data,
     }
   }
 
-  protected normalizeDeal(data: any): CRMDeal {
+  protected normalizeDeal(data: Record<string, unknown>): CRMDeal {
     return {
-      externalId: data.Id,
-      name: data.Name,
-      amount: parseFloat(data.Amount || '0'),
+      externalId: data.Id as string,
+      name: data.Name as string,
+      amount: parseFloat((data.Amount as string) || '0'),
       currency: 'USD',
-      stage: data.StageName,
-      probability: parseInt(data.Probability || '0'),
-      closeDate: data.CloseDate ? new Date(data.CloseDate) : undefined,
-      companyName: data.Account?.Name,
-      contactEmail: data.Contact?.Email,
+      stage: data.StageName as string,
+      probability: parseInt((data.Probability as string) || '0'),
+      closeDate: data.CloseDate ? new Date(data.CloseDate as string) : undefined,
+      companyName: (data.Account as { Name: string })?.Name,
+      contactEmail: (data.Contact as { Email: string })?.Email,
       metadata: data,
     }
   }

@@ -4,7 +4,7 @@ import { useState, useRef } from 'react'
 import { ArrowUpTrayIcon } from '@heroicons/react/24/outline'
 
 interface CSVUploadProps {
-  onUpload: (data: any) => void
+  onUpload: (data: Record<string, unknown>[]) => void
 }
 
 export function CSVUpload({ onUpload }: CSVUploadProps) {

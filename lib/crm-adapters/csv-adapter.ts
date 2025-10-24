@@ -97,9 +97,15 @@ export class CSVAdapter extends BaseCRMAdapter {
   }
 
   protected normalizeContact(row: ParsedRow): CRMContact {
+    // Generate a proper externalId
+    const email = row[this.mapping.email] || ''
+    const externalId = this.mapping.externalId 
+      ? row[this.mapping.externalId] 
+      : `csv_${email.replace(/[^a-zA-Z0-9]/g, '_')}_${Date.now()}`
+
     return {
-      externalId: this.mapping.externalId ? row[this.mapping.externalId] : `csv-${row[this.mapping.email]}`,
-      email: row[this.mapping.email],
+      externalId,
+      email,
       firstName: this.mapping.firstName ? row[this.mapping.firstName] : undefined,
       lastName: this.mapping.lastName ? row[this.mapping.lastName] : undefined,
       phone: this.mapping.phone ? row[this.mapping.phone] : undefined,
@@ -119,8 +125,11 @@ export class CSVAdapter extends BaseCRMAdapter {
       ? row[this.mapping.company_name] 
       : row[this.mapping.companyName || '']
 
+    // Generate a proper externalId
+    const externalId = `csv_company_${companyName.replace(/[^a-zA-Z0-9]/g, '_')}_${Date.now()}`
+
     return {
-      externalId: `csv-company-${companyName}`,
+      externalId,
       name: companyName,
       domain: this.mapping.company_domain ? row[this.mapping.company_domain] : undefined,
       industry: this.mapping.company_industry ? row[this.mapping.company_industry] : undefined,
@@ -158,11 +167,34 @@ export function parseCSV(csvText: string): ParsedRow[] {
   const lines = csvText.split('\n').filter((line) => line.trim())
   if (lines.length === 0) return []
 
-  const headers = lines[0].split(',').map((h) => h.trim())
+  // Better CSV parsing that handles quoted values
+  const parseLine = (line: string): string[] => {
+    const result: string[] = []
+    let current = ''
+    let inQuotes = false
+    
+    for (let i = 0; i < line.length; i++) {
+      const char = line[i]
+      
+      if (char === '"') {
+        inQuotes = !inQuotes
+      } else if (char === ',' && !inQuotes) {
+        result.push(current.trim())
+        current = ''
+      } else {
+        current += char
+      }
+    }
+    
+    result.push(current.trim())
+    return result
+  }
+
+  const headers = parseLine(lines[0])
   const rows: ParsedRow[] = []
 
   for (let i = 1; i < lines.length; i++) {
-    const values = lines[i].split(',').map((v) => v.trim())
+    const values = parseLine(lines[i])
     const row: ParsedRow = {}
     
     headers.forEach((header, index) => {

@@ -5,37 +5,57 @@
 
 export interface CRMContact {
   externalId: string
+  id?: string
+  name?: string
   email: string
   firstName?: string
   lastName?: string
   phone?: string
   companyName?: string
+  company?: string
   source?: string
   lifecycleStage?: string
   createdAt?: Date
+  updatedAt?: Date
   metadata?: Record<string, unknown>
+  rawData?: unknown
 }
 
 export interface CRMCompany {
   externalId: string
+  id?: string
   name: string
   domain?: string
+  website?: string
   industry?: string
   size?: string
+  createdAt?: Date
+  updatedAt?: Date
   metadata?: Record<string, unknown>
+  rawData?: unknown
 }
 
 export interface CRMDeal {
   externalId: string
+  id?: string
   name: string
   amount: number
+  value?: number
   currency?: string
   stage: string
+  status?: string
   probability?: number
   closeDate?: Date
   contactEmail?: string
+  email?: string
+  phone?: string
+  firstName?: string
+  lastName?: string
   companyName?: string
+  createdAt?: Date
+  updatedAt?: Date
   metadata?: Record<string, unknown>
+  rawData?: unknown
 }
 
 export interface ImportResult {

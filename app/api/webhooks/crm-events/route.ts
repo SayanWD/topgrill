@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServiceRoleClient } from '@/lib/supabase/server'
 import { eventSchema } from '@/lib/utils/validation'
-import crypto from 'crypto'
+// Use Web Crypto API for Edge Runtime compatibility
 
 /**
  * CRM Webhook Handler - Route Handler
@@ -10,18 +10,26 @@ import crypto from 'crypto'
  * Security: Uses service role key (bypasses RLS) after signature validation
  */
 
-function verifyWebhookSignature(
+async function verifyWebhookSignature(
   payload: string,
   signature: string,
   secret: string
-): boolean {
-  const hmac = crypto.createHmac('sha256', secret)
-  hmac.update(payload)
-  const expectedSignature = hmac.digest('hex')
-  return crypto.timingSafeEqual(
-    Buffer.from(signature),
-    Buffer.from(expectedSignature)
+): Promise<boolean> {
+  const encoder = new TextEncoder()
+  const key = await crypto.subtle.importKey(
+    'raw',
+    encoder.encode(secret),
+    { name: 'HMAC', hash: 'SHA-256' },
+    false,
+    ['sign']
   )
+  
+  const signatureBuffer = await crypto.subtle.sign('HMAC', key, encoder.encode(payload))
+  const expectedSignature = Array.from(new Uint8Array(signatureBuffer))
+    .map(b => b.toString(16).padStart(2, '0'))
+    .join('')
+  
+  return signature === expectedSignature
 }
 
 export async function POST(request: NextRequest) {
@@ -39,7 +47,7 @@ export async function POST(request: NextRequest) {
 
     const rawBody = await request.text()
 
-    if (!signature || !verifyWebhookSignature(rawBody, signature, webhookSecret)) {
+    if (!signature || !(await verifyWebhookSignature(rawBody, signature, webhookSecret))) {
       return NextResponse.json(
         { error: 'Invalid signature' },
         { status: 401 }
@@ -51,12 +59,10 @@ export async function POST(request: NextRequest) {
     const validated = eventSchema.parse(body)
 
     // Generate idempotency key if not provided
-    const idempotencyKey =
-      validated.idempotencyKey ||
-      crypto
-        .createHash('sha256')
-        .update(JSON.stringify({ ...validated, timestamp: Date.now() }))
-        .digest('hex')
+    const idempotencyKey = validated.idempotencyKey || 
+      Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(JSON.stringify({ ...validated, timestamp: Date.now() })))))
+        .map(b => b.toString(16).padStart(2, '0'))
+        .join('')
 
     // Store event using service role (bypasses RLS)
     const supabase = createServiceRoleClient()

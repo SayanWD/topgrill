@@ -1,0 +1,6 @@
+email,first_name,last_name,phone,company,industry,amount,stage
+john.doe@example.com,John,Doe,+1234567890,Acme Corp,Technology,50000,Closed Won
+jane.smith@example.com,Jane,Smith,+1987654321,TechStart,Software,25000,Proposal
+bob.wilson@example.com,Bob,Wilson,+1555123456,Global Inc,Manufacturing,75000,Negotiation
+alice.brown@example.com,Alice,Brown,+1444333222,StartupXYZ,Technology,15000,Qualified
+charlie.davis@example.com,Charlie,Davis,+1777888999,BigCorp,Finance,100000,Closed Won

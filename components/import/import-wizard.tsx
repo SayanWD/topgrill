@@ -16,9 +16,9 @@ type Step = 'source' | 'upload' | 'mapping' | 'progress' | 'complete'
 export function ImportWizard() {
   const [step, setStep] = useState<Step>('source')
   const [_source, setSource] = useState<string>('')
-  const [uploadedData, setUploadedData] = useState<any>(null)
-  const [_mapping, setMapping] = useState<any>(null)
-  const [importResult, setImportResult] = useState<any>(null)
+  const [uploadedData, setUploadedData] = useState<Record<string, unknown>[] | null>(null)
+  const [_mapping, setMapping] = useState<Record<string, string> | null>(null)
+  const [importResult, setImportResult] = useState<{ success: boolean; message: string; results?: Record<string, unknown>; error?: string } | null>(null)
 
   const handleSourceSelect = (selectedSource: string) => {
     setSource(selectedSource)
@@ -32,12 +32,12 @@ export function ImportWizard() {
     }
   }
 
-  const handleUpload = (data: any) => {
+  const handleUpload = (data: Record<string, unknown>[]) => {
     setUploadedData(data)
     setStep('mapping')
   }
 
-  const handleMapping = (mappingData: any) => {
+  const handleMapping = (mappingData: Record<string, string>) => {
     setMapping(mappingData)
     setStep('progress')
     
@@ -45,7 +45,7 @@ export function ImportWizard() {
     startImport(mappingData)
   }
 
-  const startImport = async (mappingData: any) => {
+  const startImport = async (mappingData: Record<string, string>) => {
     try {
       const response = await fetch('/api/import/crm', {
         method: 'POST',
@@ -54,7 +54,7 @@ export function ImportWizard() {
           source: 'csv',
           type: 'contacts',
           credentials: {
-            csvData: uploadedData.raw,
+            csvData: uploadedData,
             mapping: mappingData,
           },
           options: {
@@ -71,6 +71,7 @@ export function ImportWizard() {
       console.error('Import failed:', error)
       setImportResult({
         success: false,
+        message: 'Import failed',
         error: error instanceof Error ? error.message : 'Unknown error',
       })
     }
@@ -111,7 +112,7 @@ export function ImportWizard() {
       {step === 'upload' && <CSVUpload onUpload={handleUpload} />}
       {step === 'mapping' && (
         <FieldMapper
-          data={uploadedData}
+          data={uploadedData || []}
           onComplete={handleMapping}
           onBack={() => setStep('upload')}
         />
@@ -123,9 +124,9 @@ export function ImportWizard() {
           <h2 className="mb-2 text-2xl font-bold">Import Complete!</h2>
           {importResult && (
             <div className="mx-auto max-w-md space-y-2 text-sm">
-              <p>✅ Imported: {importResult.result?.imported || 0}</p>
-              <p>⏭️ Skipped: {importResult.result?.skipped || 0}</p>
-              <p>❌ Failed: {importResult.result?.failed || 0}</p>
+              <p>✅ Imported: {String(importResult.results?.imported || 0)}</p>
+              <p>⏭️ Skipped: {String(importResult.results?.skipped || 0)}</p>
+              <p>❌ Failed: {String(importResult.results?.failed || 0)}</p>
             </div>
           )}
           <button

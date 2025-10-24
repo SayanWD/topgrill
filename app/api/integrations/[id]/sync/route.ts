@@ -12,7 +12,7 @@ import { SalesforceAdapter } from '@/lib/crm-adapters/salesforce-adapter'
  * Triggers manual sync for integration
  */
 export async function POST(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
