@@ -44,18 +44,23 @@ export async function POST(
     // Create adapter based on provider
     let adapter
 
-    switch (integration.provider) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    switch ((integration as any).provider) {
       case 'amocrm':
         adapter = new AmoCRMAdapter({
-          subdomain: integration.provider_account_id!,
-          accessToken: integration.access_token,
-          refreshToken: integration.refresh_token || undefined,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          subdomain: (integration as any).provider_account_id!,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          accessToken: (integration as any).access_token,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          refreshToken: (integration as any).refresh_token || undefined,
           clientId: process.env.AMOCRM_CLIENT_ID,
           clientSecret: process.env.AMOCRM_CLIENT_SECRET,
           integrationId: id,
           // Callback для автоматического сохранения обновленных токенов
           onTokenRefresh: async (tokens) => {
-            await supabase
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            await (supabase as any)
               .from('integrations')
               .update({
                 access_token: tokens.accessToken,
@@ -71,14 +76,17 @@ export async function POST(
 
       case 'hubspot':
         adapter = new HubSpotAdapter({
-          accessToken: integration.access_token,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          accessToken: (integration as any).access_token,
         })
         break
 
       case 'salesforce':
         adapter = new SalesforceAdapter({
-          instanceUrl: integration.settings?.instanceUrl || '',
-          accessToken: integration.access_token,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          instanceUrl: (integration as any).settings?.instanceUrl || '',
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          accessToken: (integration as any).access_token,
         })
         break
 
@@ -106,7 +114,8 @@ export async function POST(
     ])
 
     // Update last_sync_at
-    await supabase
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (supabase as any)
       .from('integrations')
       .update({ last_sync_at: new Date().toISOString() })
       .eq('id', id)

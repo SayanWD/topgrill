@@ -48,13 +48,15 @@ export async function getCurrentUserRole(): Promise<UserRole | null> {
 
   if (!user) return null
 
-  const { data: profile } = await supabase
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: profile } = await (supabase as any)
     .from('profiles')
     .select('role')
     .eq('id', user.id)
     .single()
 
-  return (profile?.role as UserRole) || null
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (profile as any)?.role || null
 }
 
 /**

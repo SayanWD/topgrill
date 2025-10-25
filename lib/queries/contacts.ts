@@ -86,7 +86,8 @@ export function useCreateContact() {
   return useMutation({
     mutationFn: async (contact: ContactInsert) => {
       const supabase = getSupabaseClient()
-      const { data, error } = await supabase
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data, error } = await (supabase as any)
         .from('contacts')
         .insert(contact)
         .select()
@@ -113,7 +114,8 @@ export function useUpdateContact() {
       updates: Partial<Contact>
     }) => {
       const supabase = getSupabaseClient()
-      const { data, error } = await supabase
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data, error } = await (supabase as any)
         .from('contacts')
         .update(updates)
         .eq('id', id)

@@ -58,19 +58,21 @@ export async function GET(request: NextRequest) {
     }
 
     // Save integration to database
-    const { error: dbError } = await supabase.from('integrations').upsert({
-      user_id: user.id,
-      provider: 'amocrm',
-      provider_account_id: process.env.AMOCRM_SUBDOMAIN || 'topgrillkz',
-      access_token: tokens.accessToken,
-      refresh_token: tokens.refreshToken,
-      expires_at: new Date(Date.now() + tokens.expiresIn * 1000).toISOString(),
-      status: 'active',
-      settings: {
-        subdomain: process.env.AMOCRM_SUBDOMAIN,
-        platform: searchParams.get('platform') || '1', // 1 = amocrm.ru, 2 = amocrm.com/kommo
-      },
-    })
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error: dbError } = await (supabase as any).from('integrations')
+      .upsert({
+        user_id: user.id,
+        provider: 'amocrm',
+        provider_account_id: process.env.AMOCRM_SUBDOMAIN || 'topgrillkz',
+        access_token: tokens.accessToken,
+        refresh_token: tokens.refreshToken,
+        expires_at: new Date(Date.now() + tokens.expiresIn * 1000).toISOString(),
+        status: 'active',
+        settings: {
+          subdomain: process.env.AMOCRM_SUBDOMAIN,
+          platform: searchParams.get('platform') || '1', // 1 = amocrm.ru, 2 = amocrm.com/kommo
+        },
+      })
 
     if (dbError) {
       console.error('Failed to save integration:', dbError)

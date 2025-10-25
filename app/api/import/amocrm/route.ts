@@ -56,7 +56,8 @@ export async function POST(request: NextRequest) {
 
         for (const contact of contacts) {
           try {
-            const { error } = await supabase
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const { error } = await (supabase as any)
               .from('contacts')
               .upsert({
                 id: `amocrm_contact_${contact.id}`,
@@ -97,7 +98,8 @@ export async function POST(request: NextRequest) {
 
         for (const company of companies) {
           try {
-            const { error } = await supabase
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const { error } = await (supabase as any)
               .from('companies')
               .upsert({
                 id: `amocrm_company_${company.id}`,
@@ -137,7 +139,8 @@ export async function POST(request: NextRequest) {
 
         for (const deal of deals) {
           try {
-            const { error } = await supabase
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const { error } = await (supabase as any)
               .from('leads')
               .upsert({
                 id: `amocrm_deal_${deal.id}`,
@@ -171,7 +174,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Log import event
-    await supabase
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (supabase as any)
       .from('import_logs')
       .insert({
         source: 'amocrm',

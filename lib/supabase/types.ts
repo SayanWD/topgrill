@@ -279,9 +279,307 @@ export interface Database {
           created_at?: string
         }
       }
+      integrations: {
+        Row: {
+          id: string
+          created_at: string
+          updated_at: string
+          user_id: string
+          provider: string
+          provider_account_id: string | null
+          access_token: string
+          refresh_token: string | null
+          token_expires_at: string | null
+          settings: Json
+          status: 'active' | 'expired' | 'revoked' | 'error'
+          last_sync_at: string | null
+          last_error: string | null
+        }
+        Insert: {
+          id?: string
+          created_at?: string
+          updated_at?: string
+          user_id: string
+          provider: string
+          provider_account_id?: string | null
+          access_token: string
+          refresh_token?: string | null
+          token_expires_at?: string | null
+          settings?: Json
+          status?: 'active' | 'expired' | 'revoked' | 'error'
+          last_sync_at?: string | null
+          last_error?: string | null
+        }
+        Update: {
+          id?: string
+          created_at?: string
+          updated_at?: string
+          user_id?: string
+          provider?: string
+          provider_account_id?: string | null
+          access_token?: string
+          refresh_token?: string | null
+          token_expires_at?: string | null
+          settings?: Json
+          status?: 'active' | 'expired' | 'revoked' | 'error'
+          last_sync_at?: string | null
+          last_error?: string | null
+        }
+      }
+      leads: {
+        Row: {
+          id: string
+          created_at: string
+          updated_at: string
+          status: string
+          email: string | null
+          phone: string | null
+          first_name: string | null
+          last_name: string | null
+          value: number | null
+          facebook_sent: boolean
+          custom_data: Json
+        }
+        Insert: {
+          id?: string
+          created_at?: string
+          updated_at?: string
+          status: string
+          email?: string | null
+          phone?: string | null
+          first_name?: string | null
+          last_name?: string | null
+          value?: number | null
+          facebook_sent?: boolean
+          custom_data?: Json
+        }
+        Update: {
+          id?: string
+          created_at?: string
+          updated_at?: string
+          status?: string
+          email?: string | null
+          phone?: string | null
+          first_name?: string | null
+          last_name?: string | null
+          value?: number | null
+          facebook_sent?: boolean
+          custom_data?: Json
+        }
+      }
+      lead_events: {
+        Row: {
+          id: string
+          created_at: string
+          lead_id: string
+          event_type: string
+          event_data: Json
+        }
+        Insert: {
+          id?: string
+          created_at?: string
+          lead_id: string
+          event_type: string
+          event_data?: Json
+        }
+        Update: {
+          id?: string
+          created_at?: string
+          lead_id?: string
+          event_type?: string
+          event_data?: Json
+        }
+      }
+      import_logs: {
+        Row: {
+          id: string
+          created_at: string
+          integration_id: string
+          status: string
+          records_processed: number
+          records_imported: number
+          records_skipped: number
+          error_message: string | null
+          metadata: Json
+        }
+        Insert: {
+          id?: string
+          created_at?: string
+          integration_id: string
+          status: string
+          records_processed: number
+          records_imported: number
+          records_skipped: number
+          error_message?: string | null
+          metadata?: Json
+        }
+        Update: {
+          id?: string
+          created_at?: string
+          integration_id?: string
+          status?: string
+          records_processed?: number
+          records_imported?: number
+          records_skipped?: number
+          error_message?: string | null
+          metadata?: Json
+        }
+      }
     }
     Views: {
-      [_ in never]: never
+      mv_contacts_by_source: {
+        Row: {
+          source: string | null
+          lifecycle_stage: string | null
+          date: string
+          count: number
+          unique_companies: number
+        }
+        Insert: {
+          source?: string | null
+          lifecycle_stage?: string | null
+          date?: string
+          count?: number
+          unique_companies?: number
+        }
+        Update: {
+          source?: string | null
+          lifecycle_stage?: string | null
+          date?: string
+          count?: number
+          unique_companies?: number
+        }
+      }
+      mv_deals_pipeline: {
+        Row: {
+          stage: string
+          date: string
+          deal_count: number
+          total_value: number
+          avg_deal_size: number
+          avg_probability: number
+          weighted_value: number
+        }
+        Insert: {
+          stage?: string
+          date?: string
+          deal_count?: number
+          total_value?: number
+          avg_deal_size?: number
+          avg_probability?: number
+          weighted_value?: number
+        }
+        Update: {
+          stage?: string
+          date?: string
+          deal_count?: number
+          total_value?: number
+          avg_deal_size?: number
+          avg_probability?: number
+          weighted_value?: number
+        }
+      }
+      mv_conversion_funnel: {
+        Row: {
+          date: string
+          leads: number
+          mql: number
+          sql: number
+          opportunities: number
+          customers: number
+        }
+        Insert: {
+          date?: string
+          leads?: number
+          mql?: number
+          sql?: number
+          opportunities?: number
+          customers?: number
+        }
+        Update: {
+          date?: string
+          leads?: number
+          mql?: number
+          sql?: number
+          opportunities?: number
+          customers?: number
+        }
+      }
+      mv_revenue_by_month: {
+        Row: {
+          month: string
+          stage: string
+          deals_closed: number
+          revenue: number
+          avg_deal_size: number
+        }
+        Insert: {
+          month?: string
+          stage?: string
+          deals_closed?: number
+          revenue?: number
+          avg_deal_size?: number
+        }
+        Update: {
+          month?: string
+          stage?: string
+          deals_closed?: number
+          revenue?: number
+          avg_deal_size?: number
+        }
+      }
+      mv_top_sources: {
+        Row: {
+          source: string
+          total_contacts: number
+          converted_contacts: number
+          conversion_rate: number
+          total_deals: number
+          revenue: number
+          revenue_per_contact: number
+        }
+        Insert: {
+          source?: string
+          total_contacts?: number
+          converted_contacts?: number
+          conversion_rate?: number
+          total_deals?: number
+          revenue?: number
+          revenue_per_contact?: number
+        }
+        Update: {
+          source?: string
+          total_contacts?: number
+          converted_contacts?: number
+          conversion_rate?: number
+          total_deals?: number
+          revenue?: number
+          revenue_per_contact?: number
+        }
+      }
+      mv_activity_timeline: {
+        Row: {
+          date: string
+          activity_type: string
+          activity_count: number
+          unique_contacts: number
+          unique_users: number
+        }
+        Insert: {
+          date?: string
+          activity_type?: string
+          activity_count?: number
+          unique_contacts?: number
+          unique_users?: number
+        }
+        Update: {
+          date?: string
+          activity_type?: string
+          activity_count?: number
+          unique_contacts?: number
+          unique_users?: number
+        }
+      }
     }
     Functions: {
       [_ in never]: never

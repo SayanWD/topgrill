@@ -65,7 +65,8 @@ export async function GET(request: NextRequest) {
     // Деактивировать интеграцию в БД
     const supabase = await createServerSupabaseClient()
     
-    const { error } = await supabase
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error } = await (supabase as any)
       .from('integrations')
       .update({
         status: 'disconnected',

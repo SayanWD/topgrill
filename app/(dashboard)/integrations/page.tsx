@@ -1,6 +1,7 @@
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { IntegrationsList } from '@/components/integrations/integrations-list'
 import { ConnectCRMPanel } from '@/components/integrations/connect-crm-panel'
+import { SyncPanel } from '@/components/integrations/sync-panel'
 
 /**
  * Integrations Page - Server Component
@@ -39,6 +40,9 @@ export default async function IntegrationsPage() {
       {/* Connect New CRM */}
       <ConnectCRMPanel />
 
+      {/* Sync Panel */}
+      <SyncPanel />
+
       {/* Active Integrations */}
       <div>
         <h2 className="mb-4 text-xl font-semibold">Connected CRMs</h2>
@@ -51,7 +55,7 @@ export default async function IntegrationsPage() {
           <div className="mb-3 text-3xl">🔄</div>
           <h3 className="mb-2 font-semibold">Auto Sync</h3>
           <p className="text-sm text-gray-600">
-            Automatically sync new and updated contacts every 6 hours
+            Automatically sync new and updated contacts every 10 minutes
           </p>
         </div>
 

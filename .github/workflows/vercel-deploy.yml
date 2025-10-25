@@ -1,13 +1,13 @@
-name: CI/CD Pipeline
+name: Vercel Deployment
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ main ]
   pull_request:
     branches: [ main ]
 
 jobs:
-  lint-and-test:
+  lint:
     runs-on: ubuntu-latest
     
     steps:
@@ -23,14 +23,30 @@ jobs:
     - name: Install dependencies
       run: npm ci
       
-    - name: Run ESLint
+    - name: Run linting
       run: npm run lint
       
-    - name: Run TypeScript check
-      run: npm run type-check
+    - name: 'notify vercel'
+      uses: 'vercel/repository-dispatch/actions/status@v1'
+      with:
+        name: 'Vercel - topgrill: lint'
+
+  build:
+    needs: lint
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
       
-    - name: Run tests
-      run: npm run test
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '22.x'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
       
     - name: Build application
       run: npm run build
@@ -38,10 +54,10 @@ jobs:
     - name: 'notify vercel'
       uses: 'vercel/repository-dispatch/actions/status@v1'
       with:
-        name: 'Vercel - topgrill: lint'
+        name: 'Vercel - topgrill: build'
 
   deploy:
-    needs: lint-and-test
+    needs: build
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
     

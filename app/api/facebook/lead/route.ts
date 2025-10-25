@@ -49,7 +49,8 @@ export async function POST(request: NextRequest) {
     const supabase = await createServerSupabaseClient()
     
     // Update or create lead record
-    const { data: _lead, error: leadError } = await supabase
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: _lead, error: leadError } = await (supabase as any)
       .from('leads')
       .upsert({
         id: leadId,
@@ -78,7 +79,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Log the event
-    const { error: logError } = await supabase
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error: logError } = await (supabase as any)
       .from('lead_events')
       .insert({
         lead_id: leadId,

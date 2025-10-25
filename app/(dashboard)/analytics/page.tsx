@@ -6,6 +6,34 @@ import { RealtimeIndicator } from '@/components/shared/realtime-indicator'
 import { DateRangePicker } from '@/components/shared/date-range-picker'
 import { formatCurrency, formatNumber } from '@/lib/utils/dates'
 
+// Materialized view interfaces
+interface RevenueByMonth {
+  month: string
+  stage: string
+  deals_closed: number
+  revenue: number
+  avg_deal_size: number
+}
+
+interface DealsPipeline {
+  stage: string
+  date: string
+  deal_count: number
+  total_value: number
+  avg_deal_size: number
+  avg_probability: number
+  weighted_value: number
+}
+
+interface ConversionFunnel {
+  date: string
+  leads: number
+  mql: number
+  sql: number
+  opportunities: number
+  customers: number
+}
+
 /**
  * Analytics Dashboard - Server Component
  * Fetches aggregated metrics on the server for optimal performance
@@ -35,12 +63,12 @@ async function getAnalyticsData(_from?: string, _to?: string) {
   ])
 
   // Calculate summary metrics
-  const totalRevenue = revenueData?.reduce((sum, row) => sum + Number(row.revenue), 0) || 0
-  const totalDeals = pipelineData?.reduce((sum, row) => sum + row.deal_count, 0) || 0
+  const totalRevenue = (revenueData as RevenueByMonth[])?.reduce((sum, row) => sum + (row.revenue || 0), 0) || 0
+  const totalDeals = (pipelineData as DealsPipeline[])?.reduce((sum, row) => sum + (row.deal_count || 0), 0) || 0
   const avgDealSize = totalDeals > 0 ? totalRevenue / totalDeals : 0
 
   // Conversion rates
-  const latestFunnel = conversionData?.[0]
+  const latestFunnel = (conversionData as ConversionFunnel[])?.[0]
   const conversionRate = latestFunnel
     ? latestFunnel.leads > 0
       ? ((latestFunnel.customers / latestFunnel.leads) * 100).toFixed(1)

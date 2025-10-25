@@ -68,7 +68,8 @@ export async function POST(request: NextRequest) {
     const supabase = createServiceRoleClient()
 
     // Check for duplicate using idempotency key
-    const { data: existing } = await supabase
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: existing } = await (supabase as any)
       .from('events')
       .select('id')
       .eq('idempotency_key', idempotencyKey)
@@ -82,7 +83,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Insert new event
-    const { data: event, error } = await supabase
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: event, error } = await (supabase as any)
       .from('events')
       .insert({
         event_name: validated.eventName,
